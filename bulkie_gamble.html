@@ -1,0 +1,1059 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Bulkie Gamble</title>
+
+<style>
+  :root{
+    --glass: rgba(0,0,0,.40);
+    --border: rgba(255,255,255,.14);
+    --shadow: 0 18px 55px rgba(0,0,0,.45);
+
+    --c-common: #9aa0a6;
+    --c-uncommon: #4b4f56;
+    --c-rare: #3b82f6;
+    --c-myth: #a855f7;
+    --c-legend: #ef4444;
+    --c-special: #fbbf24;
+  }
+  *{box-sizing:border-box}
+
+  body{
+    margin:0;
+    min-height:100vh;
+    font-family: Arial, sans-serif;
+    color:#fff;
+    overflow:hidden;
+    background: url("assets/img/bg-gamble.png") center/cover no-repeat fixed;
+  }
+  .bgShade{
+    position:fixed; inset:0;
+    background: radial-gradient(circle at center, rgba(0,0,0,.10), rgba(0,0,0,.78));
+    z-index:0;
+    pointer-events:none;
+  }
+
+  /* ===== TOP ELEMENTS ===== */
+  .topbar{
+    position:fixed;
+    top:10px; left:14px; right:14px;
+    z-index:80;
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+    pointer-events:none;
+  }
+  .topbar > *{ pointer-events:auto; }
+
+  .cornerLogo{
+    width:220px;
+    height:auto;
+    display:block;
+    filter: drop-shadow(0 18px 40px rgba(0,0,0,.55));
+  }
+
+  .pill{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    padding:10px 12px;
+    border-radius:16px;
+    background: var(--glass);
+    border:1px solid var(--border);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    font-weight:1000;
+  }
+  .pill a{
+    color:#fff; text-decoration:none;
+    padding:8px 12px;
+    border-radius:14px;
+    background: rgba(255,255,255,.10);
+    border:1px solid rgba(255,255,255,.14);
+  }
+
+  /* ✅ fixed блок Home/Inventory — ещё выше, чтобы не залезал на BULKIE GAMBLE */
+  .topCenter{
+    position:fixed;
+    top:8px;                 /* ✅ выше чем было */
+    left:50%;
+    transform:translateX(-50%);
+    z-index:120;
+  }
+
+  /* music panel */
+  .vol{ display:flex; align-items:center; gap:10px; }
+  .muteBtn{
+    width:36px;height:36px;border-radius:50%;
+    border:none; cursor:pointer;
+    display:grid; place-items:center;
+    font-size:18px;
+    background:rgba(255,255,255,.18);
+    color:white;
+  }
+  .vol input{ width:180px; }
+
+  /* ===== LAYOUT ===== */
+  .wrap{
+    position:relative;
+    z-index:5;
+    width:min(1320px, 96vw);
+    margin:0 auto;
+    padding-top:120px;
+    display:grid;
+    grid-template-columns: 1fr 360px;
+    gap:16px;
+    align-items:start;
+  }
+  @media (max-width: 1040px){
+    body{ overflow:auto; }
+    .wrap{ grid-template-columns:1fr; padding-bottom:24px; padding-top:140px; }
+    .cornerLogo{ width:180px; }
+    .topCenter{ top:6px; }
+  }
+
+  /* header */
+  .header{
+    grid-column: 1 / -1;
+    padding:14px 16px;
+    border-radius:18px;
+    background: rgba(0,0,0,.72);
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter: blur(8px);
+    text-align:center;
+    box-shadow: var(--shadow);
+  }
+  .headerTitle{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:12px;
+  }
+  .header h1{
+    margin:0;
+    font-size:44px;
+    font-weight:1100;
+    letter-spacing:2px;
+    text-transform:uppercase;
+  }
+  .loserIcon{
+    width:34px;
+    height:auto;
+    opacity:.95;
+    filter: drop-shadow(0 12px 26px rgba(0,0,0,.55));
+  }
+  .header p{
+    margin:6px 0 0;
+    opacity:.92;
+    font-weight:900;
+  }
+
+  /* panels */
+  .panel{
+    border-radius:18px;
+    background: var(--glass);
+    border:1px solid rgba(255,255,255,.12);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow);
+    overflow:hidden;
+  }
+  .panelHead{
+    padding:12px 12px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+  }
+  .btn{
+    height:40px;
+    padding:0 14px;
+    border-radius:14px;
+    border:1px solid rgba(255,255,255,.14);
+    background: rgba(255,255,255,.10);
+    color:#fff;
+    font-weight:1100;
+    cursor:pointer;
+    transition: transform .15s ease, background-color .15s ease;
+  }
+  .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,.14); }
+  .btn:active{ transform: translateY(0) scale(.98); }
+  .btn.green{ border:none; background:#22c55e; color:#071a10; }
+  .mainInner{ padding:12px; }
+
+  /* case */
+  .caseArea{ display:grid; place-items:center; padding:10px 0 8px; }
+  .case{
+    width:min(360px, 70%);
+    cursor:pointer;
+    user-select:none;
+    -webkit-user-drag:none;
+    filter: drop-shadow(0 18px 55px rgba(0,0,0,.55));
+    transition: transform .15s ease;
+  }
+  .case:hover{ transform: translateY(-1px) scale(1.01); }
+  .case:active{ transform: scale(.98); }
+
+  /* roller */
+  .roller{
+    margin-top:10px;
+    position:relative;
+    border-radius:16px;
+    background: rgba(0,0,0,.45);
+    border:1px solid rgba(255,255,255,.12);
+    overflow:hidden;
+    height:168px;
+  }
+  .marker{
+    position:absolute;
+    left:50%;
+    top:0; bottom:0;
+    width:0;
+    border-left:3px solid rgba(255,255,255,.92);
+    filter: drop-shadow(0 0 10px rgba(255,255,255,.35));
+    z-index:5;
+  }
+  .strip{
+    position:absolute;
+    top:14px;
+    left:0;
+    height:140px;
+    display:flex;
+    gap:12px;
+    padding:0 18px;
+    will-change: transform;
+  }
+  .card{
+    width:140px;
+    height:140px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.14);
+    overflow:hidden;
+    position:relative;
+    flex: 0 0 auto;
+    background: rgba(255,255,255,.08);
+  }
+  .card img{ width:100%; height:100%; object-fit:cover; display:block; transform: scale(1.04); }
+  .label{
+    position:absolute;
+    left:10px; right:10px; bottom:10px;
+    font-weight:1100;
+    text-shadow: 0 10px 22px rgba(0,0,0,.65);
+  }
+  .label .name{ font-size:13px; }
+  .label .rar{ font-size:12px; opacity:.92; }
+
+  /* drops */
+  .dropsHead{
+    padding:12px 12px 10px;
+    font-weight:1200;
+    letter-spacing:1px;
+    text-transform:uppercase;
+    font-size:12px;
+    border-bottom:1px solid rgba(255,255,255,.10);
+  }
+  .dropList{ padding:12px; display:flex; flex-direction:column; gap:10px; }
+  .dropRow{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 10px;
+    border-radius:16px;
+    border:1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+  }
+  .dropRow img{
+    width:46px; height:46px;
+    border-radius:14px;
+    object-fit:cover;
+    border:1px solid rgba(255,255,255,.12);
+  }
+  .dropMeta{ min-width:0; flex:1; }
+  .dropName{ font-weight:1200; }
+  .badge{
+    font-size:11px;
+    padding:4px 10px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);
+    font-weight:1100;
+    letter-spacing:.4px;
+    text-transform:uppercase;
+  }
+  .chance{ margin-left:auto; font-weight:1100; font-size:12px; opacity:.95; white-space:nowrap; }
+
+  /* rarity */
+  .r-common{ background: rgba(154,160,166,.18); border-color: rgba(154,160,166,.34); }
+  .r-uncommon{ background: rgba(75,79,86,.28); border-color: rgba(75,79,86,.44); }
+  .r-rare{ background: rgba(59,130,246,.18); border-color: rgba(59,130,246,.34); }
+  .r-myth{ background: rgba(168,85,247,.18); border-color: rgba(168,85,247,.34); }
+  .r-legend{ background: rgba(239,68,68,.18); border-color: rgba(239,68,68,.34); }
+  .r-special{ background: rgba(251,191,36,.18); border-color: rgba(251,191,36,.38); }
+
+  /* ✅ INTRO OVERLAY */
+  .introOverlay{
+    position:fixed; inset:0;
+    z-index:9999;
+    display:none;
+    place-items:center;
+    padding:18px;
+    background: rgba(0,0,0,.42);
+    backdrop-filter: blur(12px);
+  }
+  .introOverlay.show{ display:grid; }
+  .introCard{
+    width:min(860px, 96vw);
+    border-radius:22px;
+    background: rgba(0,0,0,.58);
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow: 0 28px 80px rgba(0,0,0,.55);
+    overflow:hidden;
+    padding:18px 18px 20px;
+    cursor:pointer;
+  }
+  .introRow{ display:flex; gap:14px; align-items:center; }
+  .introIcon{
+    width:64px; height:64px;
+    border-radius:20px;
+    object-fit:cover;
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow: var(--shadow);
+    flex:0 0 auto;
+  }
+  .introText{
+    margin:0;
+    font-size:18px;
+    font-weight:1100;
+    line-height:1.45;
+  }
+  .introHint{
+    margin:10px 0 0;
+    opacity:.85;
+    font-weight:900;
+    font-size:13px;
+  }
+  .flowIn{
+    opacity:0;
+    transform: translateY(12px);
+    transition: opacity .5s ease, transform .5s ease;
+  }
+  .flowIn.on{ opacity:1; transform: translateY(0); }
+
+  /* flash */
+  .flash{
+    position:fixed; inset:0;
+    z-index:250;
+    background: radial-gradient(circle at center, rgba(255,255,255,.92), rgba(255,255,255,0) 62%);
+    opacity:0;
+    pointer-events:none;
+  }
+  .flash.on{ animation: flashIn 0.48s ease-out forwards; }
+  @keyframes flashIn{
+    0%{opacity:0}
+    35%{opacity:.92}
+    100%{opacity:0}
+  }
+
+  /* win overlay */
+  .winOverlay{
+    position:fixed; inset:0;
+    z-index:260;
+    display:none;
+    place-items:center;
+    padding:18px;
+    background: rgba(0,0,0,.44);
+    backdrop-filter: blur(10px);
+  }
+  .winOverlay.show{ display:grid; }
+  .winCard{
+    width:min(860px, 96vw);
+    border-radius:22px;
+    background: rgba(0,0,0,.62);
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow: 0 28px 80px rgba(0,0,0,.65);
+    overflow:hidden;
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    align-items:center;
+  }
+  @media (max-width:800px){ .winCard{ grid-template-columns:1fr; } }
+  .winLeft{ padding:18px; display:grid; place-items:center; }
+  .winLeft img{
+    width:min(360px, 80%);
+    border-radius:22px;
+    border:1px solid rgba(255,255,255,.12);
+    box-shadow: var(--shadow);
+    object-fit:cover;
+  }
+  .winRight{ padding:18px 18px 22px; }
+  .winRight h2{ margin:0; font-size:34px; font-weight:1200; letter-spacing:1px; }
+  .winRight .rarText{
+    margin-top:8px;
+    display:inline-flex;
+    padding:6px 12px;
+    border-radius:999px;
+    border:1px solid rgba(255,255,255,.14);
+    font-weight:1200;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+  }
+  .winRight p{ margin:12px 0 0; font-weight:1000; opacity:.92; }
+  .winBtns{ margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; }
+
+  /* inventory */
+  .invGrid{
+    padding:12px;
+    display:grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap:12px;
+  }
+  @media (max-width:980px){ .invGrid{ grid-template-columns:repeat(2,1fr);} }
+  @media (max-width:540px){ .invGrid{ grid-template-columns:1fr;} }
+
+  .invItem{
+    border-radius:18px;
+    overflow:hidden;
+    border:1px solid rgba(255,255,255,.12);
+    background: rgba(255,255,255,.06);
+    display:grid;
+    grid-template-rows: 150px auto;
+  }
+  .invItem img{ width:100%; height:150px; object-fit:cover; display:block; }
+  .invMeta{
+    padding:10px 12px 12px;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+  }
+  .invName{ font-weight:1200; }
+  .invCountBadge{
+    font-weight:1200;
+    padding:6px 10px;
+    border-radius:999px;
+    background: rgba(0,0,0,.30);
+    border:1px solid rgba(255,255,255,.12);
+    white-space:nowrap;
+  }
+</style>
+</head>
+
+<body>
+<div class="bgShade"></div>
+
+<div class="topbar">
+  <img class="cornerLogo" src="assets/img/bulktypeshi.png" alt="">
+  <div class="pill vol">
+    <button class="muteBtn" id="muteBtn" title="Mute / Unmute">🔊</button>
+    <span>Volume</span>
+    <input id="vol" type="range" min="0" max="100" value="22">
+  </div>
+</div>
+
+<div class="pill topCenter">
+  <a id="homeLink" href="index.html">Home</a>
+  <div>Inventory items: <span id="invCount">0</span></div>
+</div>
+
+<div class="wrap">
+  <div class="header">
+    <div class="headerTitle">
+      <h1>BULKIE GAMBLE</h1>
+      <img class="loserIcon" src="assets/img/loser.png" alt="">
+    </div>
+    <p>How lucky are you? Let’s see...</p>
+  </div>
+
+  <!-- GAME PANEL -->
+  <section class="panel" id="gamePanel">
+    <div class="panelHead">
+      <button class="btn" id="tickBtn" type="button">Tick: ON</button>
+      <button class="btn green" id="invBtn" type="button">Inventory</button>
+      <div style="opacity:.92;font-weight:1000">Click the case</div>
+    </div>
+
+    <div class="mainInner">
+      <div class="caseArea">
+        <img src="assets/img/case.png" class="case" id="caseImg" alt="case">
+      </div>
+
+      <div class="roller">
+        <div class="marker"></div>
+        <div class="strip" id="strip"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INVENTORY PANEL -->
+  <section class="panel" id="invPanel" style="display:none;">
+    <div class="panelHead">
+      <button class="btn" id="backBtn" type="button">Back</button>
+      <div style="font-weight:1100;opacity:.92">Inventory</div>
+      <div style="opacity:.88;font-weight:1000">Sorted by rarity</div>
+    </div>
+    <div class="invGrid" id="invGrid"></div>
+  </section>
+
+  <!-- DROPS PANEL -->
+  <aside class="panel">
+    <div class="dropsHead">Possible drops</div>
+    <div class="dropList" id="dropList"></div>
+  </aside>
+</div>
+
+<!-- ✅ INTRO -->
+<div class="introOverlay" id="introOverlay">
+  <div class="introCard" id="introCard" title="Click to continue">
+    <div class="introRow">
+      <img id="introIcon" class="introIcon flowIn" src="assets/img/gbulk.png" alt="">
+      <div style="min-width:0">
+        <p id="introMsg" class="introText flowIn"></p>
+        <div class="introHint flowIn" id="introHint">Click anywhere to continue</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="flash" id="flash"></div>
+
+<div class="winOverlay" id="winOverlay">
+  <div class="winCard">
+    <div class="winLeft">
+      <img id="winImg" src="" alt="">
+    </div>
+    <div class="winRight">
+      <h2 id="winName">Item</h2>
+      <div id="winRar" class="rarText">RARITY</div>
+      <p id="winMsg">Congrats!</p>
+      <div class="winBtns">
+        <button class="btn green" id="againBtn" type="button">Open again</button>
+        <button class="btn" id="toInvBtn" type="button">Inventory</button>
+        <button class="btn" id="closeWinBtn" type="button">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<audio id="music" src="assets/audio/intel.mp3" loop preload="auto"></audio>
+
+<script>
+/* ======================
+  DATA
+====================== */
+const RAR_ORDER = ["common","uncommon","rare","mythical","legendary","special"];
+const RAR_LABEL = {
+  common:"COMMON",
+  uncommon:"UNCOMMON",
+  rare:"RARE",
+  mythical:"MYTHICAL",
+  legendary:"LEGENDARY",
+  special:"SPECIAL ITEM"
+};
+const RAR_CLASS = {
+  common:"r-common",
+  uncommon:"r-uncommon",
+  rare:"r-rare",
+  mythical:"r-myth",
+  legendary:"r-legend",
+  special:"r-special",
+};
+
+const ITEMS = [
+  { id:"bulkie",     name:"Bulkie",     rarity:"common",    chance:61.85, img:"assets/img/bulkie.png" },
+  { id:"orthodox",   name:"Orthodox",   rarity:"uncommon",  chance:11.99, img:"assets/img/orthodox.png" },
+  { id:"optibanty",  name:"Optibanty",  rarity:"uncommon",  chance:11.99, img:"assets/img/optibanty.png" },
+  { id:"rizzy",      name:"Rizzy",      rarity:"rare",      chance:6.20,  img:"assets/img/rizzy2.png" },
+  { id:"glowburger", name:"Glowburger", rarity:"mythical",  chance:3.32,  img:"assets/img/glowburger.png" },
+  { id:"hotlneblng", name:"Hotlneblng", rarity:"mythical",  chance:3.32,  img:"assets/img/hotlneblng.png" },
+  { id:"jun",        name:"Jun",        rarity:"legendary", chance:1.25,  img:"assets/img/jun.png" },
+  { id:"special",    name:"???",        rarity:"special",   chance:0.10,  img:"assets/img/special.png" },
+];
+
+const LS_INV = "bulkie_gamble_inv_v3";
+const LS_OPENS = "bulkie_gamble_opens_v3";
+
+/* ======================
+  UI
+====================== */
+const strip = document.getElementById("strip");
+const caseImg = document.getElementById("caseImg");
+const tickBtn = document.getElementById("tickBtn");
+const invBtn = document.getElementById("invBtn");
+const backBtn = document.getElementById("backBtn");
+const gamePanel = document.getElementById("gamePanel");
+const invPanel = document.getElementById("invPanel");
+const invGrid = document.getElementById("invGrid");
+const invCount = document.getElementById("invCount");
+const dropList = document.getElementById("dropList");
+
+const flash = document.getElementById("flash");
+const winOverlay = document.getElementById("winOverlay");
+const winImg = document.getElementById("winImg");
+const winName = document.getElementById("winName");
+const winRar = document.getElementById("winRar");
+const winMsg = document.getElementById("winMsg");
+const againBtn = document.getElementById("againBtn");
+const toInvBtn = document.getElementById("toInvBtn");
+const closeWinBtn = document.getElementById("closeWinBtn");
+
+const vol = document.getElementById("vol");
+const muteBtn = document.getElementById("muteBtn");
+const music = document.getElementById("music");
+
+const introOverlay = document.getElementById("introOverlay");
+const introCard = document.getElementById("introCard");
+const introIcon = document.getElementById("introIcon");
+const introMsg = document.getElementById("introMsg");
+const introHint = document.getElementById("introHint");
+
+const homeLink = document.getElementById("homeLink");
+
+/* ✅ когда жмут Home — сбрасываем флаг, чтобы при возврате приветствие показалось снова */
+homeLink.addEventListener("click", ()=>{
+  sessionStorage.removeItem("bulkie_intro_seen");
+});
+
+/* ======================
+  AUDIO
+====================== */
+let musicBase = 0.18;
+let isMuted = false;
+let lastSlider = Number(vol.value);
+let tickEnabled = true;
+
+function applyMusicVol(){
+  if(isMuted){ music.volume = 0; return; }
+  const v = Number(vol.value)/100;
+  music.volume = Math.max(0, Math.min(1, musicBase * (v*v*1.6)));
+}
+applyMusicVol();
+
+vol.addEventListener("input", ()=>{
+  lastSlider = Number(vol.value);
+  if(lastSlider > 0) isMuted = false;
+  muteBtn.textContent = (isMuted || lastSlider===0) ? "🔇" : "🔊";
+  applyMusicVol();
+});
+
+muteBtn.addEventListener("click", async ()=>{
+  isMuted = !isMuted;
+  muteBtn.textContent = isMuted ? "🔇" : "🔊";
+  if(!isMuted && Number(vol.value) === 0){
+    vol.value = String(lastSlider || 22);
+  }
+  applyMusicVol();
+  try{ if(!isMuted && music.paused) await music.play(); }catch{}
+});
+
+(async()=>{ try { await music.play(); } catch {} })();
+
+/* tick sound */
+let audioCtx = null;
+function ctx(){
+  if(audioCtx) return audioCtx;
+  const Ctx = window.AudioContext || window.webkitAudioContext;
+  audioCtx = new Ctx();
+  return audioCtx;
+}
+function tickSfx(){
+  const c = ctx();
+  const t0 = c.currentTime;
+  const o = c.createOscillator();
+  const g = c.createGain();
+  o.type = "square";
+  o.frequency.setValueAtTime(1200, t0);
+  o.frequency.exponentialRampToValueAtTime(650, t0+0.04);
+  const base = (Number(vol.value)/100);
+  const peak = Math.max(0.001, 0.10 * base);
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(peak, t0+0.01);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+0.08);
+  o.connect(g); g.connect(c.destination);
+  o.start(t0); o.stop(t0+0.09);
+}
+
+/* win sounds */
+function grandWin(mult=1){
+  const c = ctx();
+  const t0 = c.currentTime;
+  const base = (Number(vol.value)/100);
+  const gain = c.createGain();
+  gain.gain.setValueAtTime(0.0001, t0);
+  gain.gain.exponentialRampToValueAtTime(Math.max(0.001, 0.25*base*mult), t0+0.03);
+  gain.gain.exponentialRampToValueAtTime(0.0001, t0+1.15);
+
+  const o1 = c.createOscillator();
+  const o2 = c.createOscillator();
+  const o3 = c.createOscillator();
+  o1.type="sawtooth"; o2.type="triangle"; o3.type="sine";
+  o1.frequency.setValueAtTime(220, t0);
+  o2.frequency.setValueAtTime(330, t0);
+  o3.frequency.setValueAtTime(440, t0);
+  o1.frequency.exponentialRampToValueAtTime(440, t0+0.45);
+  o2.frequency.exponentialRampToValueAtTime(660, t0+0.45);
+  o3.frequency.exponentialRampToValueAtTime(880, t0+0.45);
+
+  const lp = c.createBiquadFilter();
+  lp.type="lowpass";
+  lp.frequency.setValueAtTime(900, t0);
+  lp.frequency.exponentialRampToValueAtTime(2200, t0+0.35);
+
+  o1.connect(lp); o2.connect(lp); o3.connect(lp);
+  lp.connect(gain); gain.connect(c.destination);
+
+  o1.start(t0); o2.start(t0); o3.start(t0);
+  o1.stop(t0+1.2); o2.stop(t0+1.2); o3.stop(t0+1.2);
+}
+function veryGrandWin(){
+  grandWin(1.25);
+  const c = ctx();
+  const t0 = c.currentTime;
+  const base = (Number(vol.value)/100);
+
+  const g = c.createGain();
+  g.gain.setValueAtTime(0.0001, t0);
+  g.gain.exponentialRampToValueAtTime(Math.max(0.001, 0.35*base), t0+0.02);
+  g.gain.exponentialRampToValueAtTime(0.0001, t0+1.6);
+
+  const o = c.createOscillator();
+  o.type="sine";
+  o.frequency.setValueAtTime(880, t0);
+  o.frequency.exponentialRampToValueAtTime(1760, t0+0.25);
+  o.frequency.exponentialRampToValueAtTime(660, t0+0.9);
+
+  const hp = c.createBiquadFilter();
+  hp.type="highpass";
+  hp.frequency.setValueAtTime(400, t0);
+
+  o.connect(hp); hp.connect(g); g.connect(c.destination);
+  o.start(t0); o.stop(t0+1.7);
+}
+
+/* unlock audio on first click */
+document.addEventListener("click", async ()=>{
+  try{
+    const c = ctx();
+    if(c.state === "suspended") await c.resume();
+    if(!isMuted && music.paused) await music.play();
+  }catch{}
+},{ once:true });
+
+/* ======================
+  INTRO (работает без referrer)
+====================== */
+const INTRO_1 = "gBulk little gambler, here you can test your luck and obtain cards of different rarities.";
+const INTRO_2 = "You also have a chance to get a special item, but I don't think you'll succeed...";
+
+let introStep = 0;
+
+function flowReset(){
+  introIcon.classList.remove("on");
+  introMsg.classList.remove("on");
+  introHint.classList.remove("on");
+  void introCard.offsetWidth;
+  requestAnimationFrame(()=>{
+    introIcon.classList.add("on");
+    introMsg.classList.add("on");
+    introHint.classList.add("on");
+  });
+}
+
+function setIntro(step){
+  introStep = step;
+  if(step === 1){
+    introIcon.src = "assets/img/gbulk.png";
+    introMsg.textContent = INTRO_1;
+    introHint.textContent = "Click anywhere to continue";
+  }else{
+    introIcon.src = "assets/img/loser.png";
+    introMsg.textContent = INTRO_2;
+    introHint.textContent = "Click anywhere to start";
+  }
+  flowReset();
+}
+
+(function initIntro(){
+  const seen = sessionStorage.getItem("bulkie_intro_seen") === "1";
+  if(!seen){
+    introOverlay.classList.add("show");
+    setIntro(1);
+  }
+})();
+
+introCard.addEventListener("click", ()=>{
+  if(introStep === 1){
+    setIntro(2);
+  }else{
+    introOverlay.classList.remove("show");
+    sessionStorage.setItem("bulkie_intro_seen", "1"); /* ✅ больше не показываем при возврате из инвентаря */
+  }
+});
+
+/* ======================
+  INVENTORY
+====================== */
+function loadInv(){
+  try{ return JSON.parse(localStorage.getItem(LS_INV) || "{}"); }
+  catch{ return {}; }
+}
+function saveInv(obj){
+  localStorage.setItem(LS_INV, JSON.stringify(obj));
+}
+function totalInvCount(inv){
+  let n=0;
+  for(const k in inv) n += inv[k] || 0;
+  return n;
+}
+function updateInvCount(){
+  const inv = loadInv();
+  invCount.textContent = String(totalInvCount(inv));
+}
+updateInvCount();
+
+function rarityIndex(r){ return RAR_ORDER.indexOf(r); }
+
+function renderInventory(){
+  const inv = loadInv();
+  const list = ITEMS
+    .filter(it => (inv[it.id] || 0) > 0)
+    .slice()
+    .sort((a,b)=> rarityIndex(a.rarity) - rarityIndex(b.rarity));
+
+  invGrid.innerHTML = "";
+  if(list.length === 0){
+    invGrid.innerHTML = `<div style="opacity:.9;font-weight:1000;padding:12px">Inventory empty. Open the case 👀</div>`;
+    return;
+  }
+
+  for(const it of list){
+    const c = document.createElement("div");
+    c.className = `invItem ${RAR_CLASS[it.rarity]}`;
+    c.innerHTML = `
+      <img src="${it.img}" alt="">
+      <div class="invMeta">
+        <div>
+          <div class="invName">${it.name}</div>
+          <div style="margin-top:4px;font-size:12px;opacity:.9;font-weight:1000">${RAR_LABEL[it.rarity]}</div>
+        </div>
+        <div class="invCountBadge">x${inv[it.id]||0}</div>
+      </div>
+    `;
+    invGrid.appendChild(c);
+  }
+}
+
+/* navigation */
+invBtn.addEventListener("click", ()=>{
+  renderInventory();
+  gamePanel.style.display = "none";
+  invPanel.style.display = "";
+});
+backBtn.addEventListener("click", ()=>{
+  invPanel.style.display = "none";
+  gamePanel.style.display = "";
+});
+
+/* ======================
+  DROPS LIST
+====================== */
+function renderDrops(){
+  dropList.innerHTML = "";
+  for(const it of ITEMS){
+    const row = document.createElement("div");
+    row.className = `dropRow ${RAR_CLASS[it.rarity]}`;
+    row.innerHTML = `
+      <img src="${it.img}" alt="">
+      <div class="dropMeta">
+        <div class="dropName">${it.name}</div>
+        <div style="margin-top:4px;">
+          <span class="badge ${RAR_CLASS[it.rarity]}">${RAR_LABEL[it.rarity]}</span>
+        </div>
+      </div>
+      <div class="chance">chance: ${it.chance.toFixed(2)}%</div>
+    `;
+    dropList.appendChild(row);
+  }
+}
+renderDrops();
+
+/* ======================
+  ROLL
+====================== */
+function weightedPick(){
+  const r = Math.random() * 100;
+  let acc = 0;
+  for(const it of ITEMS){
+    acc += it.chance;
+    if(r <= acc) return it;
+  }
+  return ITEMS[0];
+}
+function opensCount(){
+  return Number(localStorage.getItem(LS_OPENS) || "0");
+}
+function incOpens(){
+  const n = opensCount() + 1;
+  localStorage.setItem(LS_OPENS, String(n));
+  return n;
+}
+
+function buildStrip(finalItem){
+  const N = 56;
+  const arr = [];
+  const mythPlus = ITEMS.filter(i => ["mythical","legendary","special"].includes(i.rarity));
+  const low = ITEMS.filter(i => ["common","uncommon","rare"].includes(i.rarity));
+
+  for(let i=0;i<N;i++){
+    let it;
+    if(i % 2 === 0){
+      it = mythPlus[Math.floor(Math.random()*mythPlus.length)];
+    }else{
+      it = low[Math.floor(Math.random()*low.length)];
+    }
+    arr.push(it);
+  }
+
+  const stopIndex = N - 7;
+  arr[stopIndex] = finalItem;
+  return { arr, stopIndex };
+}
+
+function renderStrip(items){
+  strip.innerHTML = "";
+  for(const it of items){
+    const d = document.createElement("div");
+    d.className = "card";
+    d.innerHTML = `
+      <img src="${it.img}" alt="">
+      <div class="label">
+        <div class="name">${it.name}</div>
+        <div class="rar">${RAR_LABEL[it.rarity]}</div>
+      </div>
+    `;
+    strip.appendChild(d);
+  }
+}
+
+let spinning = false;
+
+function flashThenReveal(item){
+  flash.classList.remove("on");
+  void flash.offsetWidth;
+  flash.classList.add("on");
+  setTimeout(()=> showWin(item), 220);
+}
+
+function showWin(item){
+  const inv = loadInv();
+  inv[item.id] = (inv[item.id]||0) + 1;
+  saveInv(inv);
+  updateInvCount();
+
+  if(item.rarity === "special"){
+    veryGrandWin();
+  }else if(item.rarity === "mythical" || item.rarity === "legendary"){
+    grandWin(1.0);
+  }
+
+  winImg.src = (item.rarity === "special") ? "assets/img/kobie-kdot.png" : item.img;
+  winName.textContent = item.rarity === "special" ? "Kobie (kdot)" : item.name;
+  winRar.textContent = item.rarity === "special" ? "SPECIAL ITEM" : RAR_LABEL[item.rarity];
+  winRar.className = `rarText ${RAR_CLASS[item.rarity]}`;
+  winMsg.textContent = item.rarity === "special" ? "Congrats mfer!" : "Congrats!";
+  winOverlay.classList.add("show");
+}
+
+function hideWin(){ winOverlay.classList.remove("show"); }
+
+againBtn.addEventListener("click", ()=>{ hideWin(); spin(); });
+toInvBtn.addEventListener("click", ()=>{
+  hideWin();
+  renderInventory();
+  gamePanel.style.display = "none";
+  invPanel.style.display = "";
+});
+closeWinBtn.addEventListener("click", hideWin);
+winOverlay.addEventListener("click", (e)=>{ if(e.target === winOverlay) hideWin(); });
+
+function getCurrentTranslateX(){
+  const st = getComputedStyle(strip).transform;
+  if(!st || st === "none") return 0;
+  const m = new DOMMatrix(st);
+  return m.m41;
+}
+
+function spin(){
+  if(spinning) return;
+  spinning = true;
+
+  const n = incOpens();
+  let finalItem;
+  if(n === 101){
+    finalItem = ITEMS.find(i => i.rarity === "special");
+  }else{
+    finalItem = weightedPick();
+  }
+
+  const { arr, stopIndex } = buildStrip(finalItem);
+  renderStrip(arr);
+
+  const cardW = 140;
+  const gap = 12;
+  const pad = 18;
+  const step = cardW + gap;
+
+  const rollerRect = document.querySelector(".roller").getBoundingClientRect();
+  const markerX = rollerRect.width / 2;
+
+  const targetCenter = pad + stopIndex * step + cardW/2;
+  const targetTranslate = markerX - targetCenter;
+
+  strip.style.transition = "none";
+  strip.style.transform = "translateX(0px)";
+  void strip.offsetWidth;
+
+  let tickTimer = null;
+  let lastTickIndex = -9999;
+
+  function startTicks(){
+    if(tickTimer) clearInterval(tickTimer);
+    tickTimer = setInterval(()=>{
+      if(!tickEnabled) return;
+      const current = getCurrentTranslateX();
+      const underX = markerX - current - pad;
+      const idx = Math.floor(underX / step);
+      if(idx !== lastTickIndex){
+        lastTickIndex = idx;
+        tickSfx();
+      }
+    }, 35);
+  }
+  function stopTicks(){
+    if(tickTimer) clearInterval(tickTimer);
+    tickTimer = null;
+  }
+
+  startTicks();
+
+  strip.style.transition = "transform 6.6s cubic-bezier(.08,.6,.1,1)";
+  strip.style.transform = `translateX(${targetTranslate}px)`;
+
+  setTimeout(()=>{
+    stopTicks();
+    spinning = false;
+    flashThenReveal(finalItem);
+  }, 6700);
+}
+
+caseImg.addEventListener("click", spin);
+
+/* Tick button toggle */
+tickBtn.addEventListener("click", ()=>{
+  tickEnabled = !tickEnabled;
+  tickBtn.textContent = tickEnabled ? "Tick: ON" : "Tick: OFF";
+});
+</script>
+</body>
+</html>

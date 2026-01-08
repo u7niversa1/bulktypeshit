@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bulk Type Shit</title>
+
+<style>
+:root{
+  --glass: rgba(0,0,0,.35);
+  --border: rgba(255,255,255,.15);
+  --shadow: 0 18px 55px rgba(0,0,0,.45);
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family: Arial, sans-serif;
+  color:white;
+
+  background-image: url("assets/img/bg-home.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+
+  overflow-x:hidden;
+}
+
+.bg-overlay{
+  position:fixed;
+  inset:0;
+  background: radial-gradient(circle at center, rgba(0,0,0,0.12), rgba(0,0,0,0.76));
+  z-index:0;
+  pointer-events:none;
+}
+
+.page{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+.hero{
+  padding-top:90px;
+  padding-bottom:24px;
+  text-align:center;
+  width:min(980px, 94vw);
+}
+
+/* LOGO REVEAL */
+.logo-wrap{
+  width:min(760px,92vw);
+  margin:0 auto;
+  position:relative;
+  filter: drop-shadow(0 18px 40px rgba(0,0,0,.55));
+}
+.logo{
+  width:100%;
+  display:block;
+  clip-path: inset(0 100% 0 0);
+  animation: revealLogo 1.35s ease-out forwards;
+}
+@keyframes revealLogo{
+  from{ clip-path: inset(0 100% 0 0); }
+  to  { clip-path: inset(0 0 0 0); }
+}
+
+.text-box{
+  margin-top:16px;
+  padding:14px 16px;
+  border-radius:18px;
+  background: rgba(0,0,0,.38);
+  border:1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+}
+
+/* typed row */
+.typed-row{
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
+  gap:10px;
+  padding-top:2px;
+}
+
+.bulki-mini{
+  width:26px;
+  height:26px;
+  object-fit:contain;
+  filter: drop-shadow(0 10px 22px rgba(0,0,0,.55));
+  opacity:0;
+  transform: translateY(6px);
+  clip-path: inset(0 100% 0 0);
+  flex: 0 0 auto;
+  margin-top:2px;
+}
+.bulki-mini.reveal{
+  animation: revealMini 1.1s ease-out forwards;
+}
+@keyframes revealMini{
+  0%   { opacity:0; transform: translateY(6px); clip-path: inset(0 100% 0 0); }
+  55%  { opacity:1; }
+  100% { opacity:1; transform: translateY(0);  clip-path: inset(0 0 0 0); }
+}
+
+.typed{
+  margin:0;
+  font-weight:1000;
+  font-size:14px;
+  line-height:1.55;
+  text-shadow: 0 10px 26px rgba(0,0,0,.65);
+  min-height:48px;
+}
+
+/* ONLY GAMES tab, bigger */
+.tabs{
+  margin-top:14px;
+  display:flex;
+  justify-content:center;
+}
+.tab{
+  padding:14px 22px;
+  border-radius:18px;
+  background: rgba(0,0,0,.40);
+  border:1px solid rgba(255,255,255,.16);
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow);
+  font-weight:1200;
+  letter-spacing:.9px;
+  text-transform:uppercase;
+  cursor:pointer;
+  transition: transform .15s ease, background-color .15s ease;
+  user-select:none;
+  font-size:14px;
+}
+.tab:hover{ transform: translateY(-1px); background: rgba(255,255,255,.12); }
+.tab:active{ transform: translateY(0) scale(.98); }
+
+.subtabs{
+  width:min(640px, 94vw);
+  margin:12px auto 0;
+  display:none;
+  flex-direction:column;
+  gap:10px;
+}
+.subtabs.open{ display:flex; }
+
+.game-link{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:12px 14px;
+  border-radius:16px;
+  background: rgba(0,0,0,.45);
+  border:1px solid rgba(255,255,255,.14);
+  backdrop-filter: blur(10px);
+  color:white;
+  text-decoration:none;
+  font-weight:1200;
+  box-shadow: var(--shadow);
+}
+
+.game-icon{
+  width:40px;
+  height:40px;
+  border-radius:12px;
+  object-fit:cover;
+}
+
+.tag{
+  margin-left:auto;
+  font-size:11px;
+  padding:5px 10px;
+  border-radius:999px;
+  background:rgba(34,197,94,.25);
+  border:1px solid rgba(34,197,94,.35);
+  font-weight:1200;
+}
+
+.footer{
+  margin-top:auto;
+  padding:28px 16px 34px;
+  width:min(980px, 94vw);
+  display:flex;
+  justify-content:center;
+}
+
+/* ✅ рамка снизу теперь почти в упор к кнопкам */
+.bottom-links{
+  display:inline-flex;
+  gap:14px;
+  justify-content:center;
+  flex-wrap:wrap;
+  padding:6px;                 /* было 14px */
+  border-radius:16px;
+  background:rgba(0,0,0,.4);
+  border:1px solid rgba(255,255,255,.14);
+  box-shadow: var(--shadow);
+}
+
+.x-btn{
+  padding:12px 18px;
+  border-radius:14px;
+  background:rgba(255,255,255,.1);
+  border:1px solid rgba(255,255,255,.14);
+  color:white;
+  text-decoration:none;
+  font-weight:1000;
+}
+</style>
+</head>
+
+<body>
+<div class="bg-overlay"></div>
+
+<div class="page">
+  <section class="hero">
+    <div class="logo-wrap">
+      <img src="assets/img/bulktypeshi.png" class="logo" alt="BULK TYPE SHIT">
+    </div>
+
+    <div class="text-box">
+      <div class="typed-row">
+        <img src="assets/img/bulkie.png" id="bulkieMini" class="bulki-mini" alt="">
+        <p class="typed" id="typed"></p>
+      </div>
+
+      <div class="tabs">
+        <div class="tab" id="gamesTab">Games</div>
+      </div>
+
+      <div class="subtabs" id="gamesSub">
+        <a class="game-link" href="games.html">
+          <img src="assets/img/kobie.png" class="game-icon" alt="">
+          BULK fast
+          <span class="tag">PLAY</span>
+        </a>
+
+        <a class="game-link" href="bulkie_gamble.html">
+          <img src="assets/img/case.png" class="game-icon" alt="">
+          Bulkie Gamble
+          <span class="tag">PLAY</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="bottom-links">
+      <a class="x-btn" href="https://x.com/bulktrade" target="_blank" rel="noopener noreferrer">BULK on X</a>
+
+      <!-- ✅ новая вкладка -->
+      <a class="x-btn" href="https://t.me/tradebulk" target="_blank" rel="noopener noreferrer">BULK on Telegram</a>
+
+      <a class="x-btn" href="https://x.com/u7niversal" target="_blank" rel="noopener noreferrer">Creator on X</a>
+    </div>
+  </footer>
+</div>
+
+<script>
+const TEXT = "Welcome to the gaming site associated with BULK. All games are just the sick fantasy of the developer, but I hope you get at least a dose of pleasure and fun from playing them.";
+const typed = document.getElementById("typed");
+const mini = document.getElementById("bulkieMini");
+
+function typeInto(el, text, speed=16){
+  el.textContent = "";
+  let i = 0;
+  const tick = () => {
+    el.textContent += text[i] || "";
+    i++;
+    if(i <= text.length) setTimeout(tick, speed);
+  };
+  tick();
+}
+
+setTimeout(() => {
+  mini.classList.add("reveal");
+  typeInto(typed, TEXT, 16);
+}, 900);
+
+/* games toggle */
+const gamesTab = document.getElementById("gamesTab");
+const gamesSub = document.getElementById("gamesSub");
+gamesTab.addEventListener("click", () => {
+  gamesSub.classList.toggle("open");
+});
+</script>
+</body>
+</html>

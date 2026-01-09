@@ -369,6 +369,39 @@
     .layout{ grid-template-columns:1fr; }
     .board{ position:relative; top:auto; }
   }
+  /* ===== MOBILE FIXES ===== */
+@media (max-width: 600px){
+  body{
+    overflow:auto;                 /* вместо hidden — можно скроллить */
+    -webkit-overflow-scrolling: touch;
+    background-attachment: scroll; /* вместо fixed — меньше лагов на iOS */
+    place-items: stretch;          /* чтобы контент не “упирался” в центр */
+    padding: 12px;
+  }
+
+  .layout{ width: 100%; }
+
+  .arena{ height: 360px; }         /* чуть ниже, чтобы влезало */
+
+  .sound-panel{
+    right:10px; top:10px;
+    gap:10px;
+    padding:10px 12px;
+  }
+  .sound-panel input{ width:110px; }
+
+  .toc-logo{ width:150px; }        /* логотип меньше */
+  .yeti-fire{
+    left:10px;
+    bottom:10px;
+    width:min(210px, 50vw);
+    opacity:.55;
+  }
+
+  .nav-btn{ height:44px; }         /* удобнее тапать */
+  #startBtn{ padding:14px 18px; }
+}
+
 </style>
 </head>
 

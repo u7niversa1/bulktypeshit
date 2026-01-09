@@ -401,6 +401,33 @@
   .nav-btn{ height:44px; }         /* удобнее тапать */
   #startBtn{ padding:14px 18px; }
 }
+  /* ===== MOBILE: hide logo + volume, move Home вниз ===== */
+@media (max-width: 600px){
+  /* убрать эмблему Bulk Type Shit */
+  .toc{ 
+    display: none !important;
+  }
+
+  /* убрать ползунок громкости */
+  .sound-panel{
+    display: none !important;
+  }
+
+  /* перенести Home вниз (как на твоём скрине в кружке) */
+  .home-center{
+    top: auto !important;
+    left: 14px !important;
+    right: auto !important;
+    transform: none !important;
+    bottom: calc(14px + env(safe-area-inset-bottom)) !important; /* чтобы не пряталось за панель iPhone */
+    z-index: 9999;
+  }
+
+  .home-center .nav-btn{
+    height: 44px; /* удобнее тапать */
+    padding: 0 16px;
+  }
+}
 </style>
 </head>
 

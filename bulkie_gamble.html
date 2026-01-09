@@ -475,6 +475,23 @@
   .header h1{ font-size:32px; }    /* заголовок меньше */
   .btn{ height:44px; }             /* удобнее тап */
 }
+  /* ===== MOBILE: hide logo + volume ===== */
+@media (max-width: 600px){
+  /* убрать эмблему Bulk Type Shit */
+  .cornerLogo{
+    display: none !important;
+  }
+
+  /* убрать ползунок громкости */
+  .pill.vol{
+    display: none !important;
+  }
+
+  /* чтобы верхняя панель не выглядела пустой/кривой */
+  .topbar{
+    justify-content: flex-end;
+  }
+}
 </style>
 </head>
 

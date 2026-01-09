@@ -442,6 +442,39 @@
     border:1px solid rgba(255,255,255,.12);
     white-space:nowrap;
   }
+  /* ===== MOBILE FIXES ===== */
+@media (max-width: 600px){
+  body{
+    overflow:auto;                 /* на всякий случай, чтобы всегда был скролл */
+    -webkit-overflow-scrolling: touch;
+    background-attachment: scroll; /* iOS/Android: меньше лагов */
+  }
+
+  .topbar{
+    top:8px; left:10px; right:10px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
+  .cornerLogo{ width:150px; }
+
+  .pill{ padding:8px 10px; border-radius:14px; }
+  .vol input{ width:120px; }       /* чтобы не вылазило */
+
+  .topCenter{
+    top:auto;
+    bottom:10px;                   /* удобнее большим пальцем */
+    left:50%;
+    transform:translateX(-50%);
+  }
+
+  .wrap{
+    padding-top:120px;             /* чтобы верхние панели не перекрывали */
+    width: min(980px, 94vw);
+  }
+
+  .header h1{ font-size:32px; }    /* заголовок меньше */
+  .btn{ height:44px; }             /* удобнее тап */
+}
 </style>
 </head>
 
